@@ -23,6 +23,7 @@ validators for Iranian identifiers.
 - Vitest + Testing Library (jsdom), plus a small real-browser suite (Vitest browser
   mode driving the installed Edge through Playwright) for layout/bidi geometry.
 - pnpm.
+- License: MIT (same as Shamsi-Calendar and the ported jalaali-js code).
 
 ## Entries
 
@@ -89,6 +90,14 @@ validators for Iranian identifiers.
   extras: holidays, `weekStartsOn`, `classNames`, `asChild`, `isDateDisabled`,
   month/year jump, Today/Clear footer. Day arithmetic never uses `Date` + 24h
   (DST bug in Shamsi-Calendar).
+  - `showHolidays` defaults to `true` (as in Shamsi-Calendar); lunar holidays use the tabular
+    Hijri calendar (identical to ICU's islamic-civil), so they can be a day off the announced date.
+  - Typed entry accepts «۱۴۰۴/۰۱/۱۵», `1404-1-15` and, for number-only keyboards, `14040115`.
+  - The dialog renders inline (no portal), so it inherits `dir` and CSS variables; it opens
+    upwards when there is no room below.
+- Masked inputs keep the caret next to the same digit through formatting; deleting a lone
+  separator deletes the neighbouring digit instead (decided from `inputType`, so it also works
+  on Android keyboards whose key events report "Unidentified").
 
 ## CSS
 

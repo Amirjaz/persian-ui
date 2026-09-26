@@ -1,0 +1,34 @@
+.pui-price-input__units {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border-radius: calc(var(--pui-radius) - 2px);
+  background: var(--pui-price-input-units-background, var(--pui-color-hover));
+}
+
+.pui-price-input__unit {
+  padding-block: 0.125rem;
+  padding-inline: 0.5rem;
+  border: 0;
+  border-radius: calc(var(--pui-radius) - 4px);
+  background: transparent;
+  color: var(--pui-color-muted);
+  font: inherit;
+  font-size: 0.8125em;
+  cursor: pointer;
+}
+
+.pui-price-input__unit[aria-checked="true"] {
+  background: var(--pui-color-background);
+  color: var(--pui-color-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+
+.pui-price-input__unit:focus-visible {
+  outline: var(--pui-focus-ring-width) solid var(--pui-color-focus-ring);
+  outline-offset: 1px;
+}
+
+.pui-price-input__unit:disabled {
+  cursor: not-allowed;
+}

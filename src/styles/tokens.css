@@ -1,0 +1,28 @@
+/*
+ * Global design tokens. Override any of them on :root or on a wrapper.
+ * Components also read their own tokens (e.g. --pui-field-height) with these
+ * as fallbacks; those are never declared here, so setting one anywhere wins.
+ */
+:root {
+  --pui-font-family: inherit;
+  --pui-font-size: 0.9375rem;
+  --pui-line-height: 1.5;
+
+  --pui-color-text: #18181b;
+  --pui-color-muted: #71717a;
+  --pui-color-background: #ffffff;
+  --pui-color-surface: #ffffff;
+  --pui-color-border: #d4d4d8;
+  --pui-color-hover: #f4f4f5;
+  --pui-color-accent: #2563eb;
+  --pui-color-accent-contrast: #ffffff;
+  --pui-color-danger: #b91c1c;
+  --pui-color-holiday: #b91c1c;
+  --pui-color-focus-ring: #2563eb;
+
+  --pui-radius: 0.5rem;
+  --pui-control-height: 2.5rem;
+  --pui-focus-ring-width: 2px;
+  --pui-shadow-popup: 0 8px 24px rgb(0 0 0 / 0.16);
+  --pui-z-index-popup: 50;
+}

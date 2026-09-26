@@ -32,6 +32,7 @@ function hiddenCharacters(text: string): string[] {
     }
     const codePoint = ch.codePointAt(0)!;
     const hidden =
+      codePoint === 0x00a0 ||
       codePoint === 0x00ad ||
       codePoint === 0x061c ||
       (codePoint >= 0x200b && codePoint <= 0x200f) ||

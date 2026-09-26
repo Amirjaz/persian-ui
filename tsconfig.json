@@ -23,5 +23,5 @@
       "@amirjaz/persian-ui/core": ["./src/core/index.ts"]
     }
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "playground/**/*.tsx"]
 }

@@ -44,6 +44,8 @@ const COMBINING_MARK = /\p{M}/u;
  *   that never join forward) are removed
  * - runs of spaces/tabs collapsed to one space, lines trimmed, line breaks kept
  *
+ * Normalizing twice gives the same result as normalizing once.
+ *
  * `search` mode additionally strips all diacritics, tatweel and invisible
  * formatting characters (ZWNJ included, so «می‌روم» and «میروم» match), folds
  * ۀ/ة → ه, أ/إ/آ/ٱ → ا, ؤ → و, ئ → ی, converts all digits to Latin, lowercases
@@ -54,16 +56,20 @@ export function normalizePersian(text: string, options: NormalizeOptions = {}): 
 }
 
 function normalizeStandard(text: string): string {
-  const unified = text
-    .normalize("NFC")
+  // Presentation forms first, so letters they expand to can compose with the marks after them.
+  const letters = text
     .replace(/\ufeff/g, "") // byte order mark
     .replace(/[\ufb50-\ufdef\ufe70-\ufefc]/g, (form) => form.normalize("NFKC")) // presentation forms
+    .normalize("NFC")
     .replace(/[\u064a\u0649]/g, "\u06cc") // ي ى → ی
     .replace(/\u0643/g, "\u06a9") // ك → ک
     .replace(/[\u0660-\u0669]/g, (digit) => String.fromCharCode(digit.charCodeAt(0) - 0x0660 + 0x06f0))
-    .replace(/\u0647\u0654/g, "\u06c0"); // ه + hamza above → ۀ
+    .replace(/\u0647\u0654/g, "\u06c0"); // ه + hamza above → ۀ, before ZWNJ decisions (ۀ never joins forward)
 
-  return cleanZwnj(unified)
+  // Removing a ZWNJ can bring a letter and a mark together: compose (and unify ۀ) again.
+  return cleanZwnj(letters)
+    .normalize("NFC")
+    .replace(/\u0647\u0654/g, "\u06c0") // ه + hamza above → ۀ
     .replace(/\r\n?|[\u2028\u2029]/g, "\n") // CR, CRLF, line and paragraph separators
     .replace(/[^\S\n]+/g, " ")
     .replace(/ ?\n ?/g, "\n")

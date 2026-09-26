@@ -42,6 +42,25 @@ describe("normalizePersian: standard mode", () => {
     expect(standard(RIAL_SIGN)).toBe(RIAL_SIGN);
   });
 
+  it("composes a mark with a letter that came out of a ligature, so a second pass changes nothing", () => {
+    // ﻻ + hamza above: the ligature expands to ل + ا, and ا + hamza composes to أ.
+    const text = `${fromCodes(0xfefb)}${ch.HAMZA_ABOVE}`;
+    expect(standard(text)).toBe(`ل${ch.ALEF_HAMZA_ABOVE}`);
+    expect(standard(standard(text))).toBe(standard(text));
+  });
+
+  it("decides about a ZWNJ after ۀ is unified, so a second pass changes nothing", () => {
+    // ۀ never joins forward, so the ZWNJ after it has no effect and goes.
+    const text = `${ch.HEH}${ch.HAMZA_ABOVE}${ch.ZWNJ}ب`;
+    expect(standard(text)).toBe(`${ch.HEH_WITH_YEH_ABOVE}ب`);
+    expect(standard(standard(text))).toBe(standard(text));
+  });
+
+  it("composes a letter and a mark that a removed ZWNJ separated", () => {
+    const text = `${ch.ALEF}${ch.ZWNJ}${ch.HAMZA_ABOVE}`;
+    expect(standard(text)).toBe(ch.ALEF_HAMZA_ABOVE);
+  });
+
   it("removes byte order marks", () => {
     expect(standard(`${ch.BOM}سلام`)).toBe("سلام");
   });
@@ -172,18 +191,18 @@ describe("normalizePersian properties", () => {
   it("standard mode is idempotent", () => {
     fc.assert(fc.property(persianish, (text) => {
       expect(standard(standard(text))).toBe(standard(text));
-    }));
+    }), { numRuns: 5000 });
   });
 
   it("search mode is idempotent", () => {
     fc.assert(fc.property(persianish, (text) => {
       expect(search(search(text))).toBe(search(text));
-    }));
+    }), { numRuns: 5000 });
   });
 
   it("standard normalization never changes the search key", () => {
     fc.assert(fc.property(persianish, (text) => {
       expect(search(standard(text))).toBe(search(text));
-    }));
+    }), { numRuns: 5000 });
   });
 });

@@ -1,0 +1,96 @@
+.pui-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pui-field-gap, 0.375rem);
+  font-family: var(--pui-font-family);
+  font-size: var(--pui-font-size);
+  line-height: var(--pui-line-height);
+  color: var(--pui-color-text);
+}
+
+.pui-field__label {
+  font-weight: var(--pui-field-label-weight, 500);
+}
+
+.pui-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: var(--pui-field-height, var(--pui-control-height));
+  padding-inline: var(--pui-field-padding-inline, 0.75rem);
+  border: var(--pui-field-border-width, 1px) solid var(--pui-field-border-color, var(--pui-color-border));
+  border-radius: var(--pui-field-radius, var(--pui-radius));
+  background: var(--pui-field-background, var(--pui-color-background));
+}
+
+.pui-field__control:focus-within {
+  outline: var(--pui-focus-ring-width) solid var(--pui-color-focus-ring);
+  outline-offset: 1px;
+}
+
+.pui-field__input {
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: calc(var(--pui-field-height, var(--pui-control-height)) - 2px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  text-align: start;
+}
+
+/*
+ * The input's content is always left-to-right (dir="ltr"), but it lines up
+ * with the page: flush with the start of the line in right-to-left pages.
+ */
+[dir="rtl"] .pui-field__input {
+  text-align: end;
+}
+
+[dir="ltr"] .pui-field__input {
+  text-align: start;
+}
+
+[dir="ltr"] [dir="rtl"] .pui-field__input {
+  text-align: end;
+}
+
+.pui-field__input::placeholder {
+  color: var(--pui-color-muted);
+  opacity: 1;
+}
+
+.pui-field__affix {
+  flex-shrink: 0;
+  color: var(--pui-color-muted);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.pui-field__hint {
+  color: var(--pui-color-muted);
+  font-size: 0.875em;
+}
+
+.pui-field__error {
+  color: var(--pui-color-danger);
+  font-size: 0.875em;
+}
+
+/* Kept in the page while empty so screen readers announce it when it fills. */
+.pui-field__error:empty {
+  margin-block-start: calc(-1 * var(--pui-field-gap, 0.375rem));
+}
+
+.pui-field[data-invalid] .pui-field__control {
+  border-color: var(--pui-color-danger);
+}
+
+.pui-field[data-disabled] .pui-field__control {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

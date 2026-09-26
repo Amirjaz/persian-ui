@@ -1,0 +1,12 @@
+{
+  "name": "persian-ui-react18-check",
+  "private": true,
+  "description": "Installs React 18 so the component tests can also run against it (see vitest.config.ts).",
+  "devDependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@testing-library/dom": "^10.4.0"
+  }
+}

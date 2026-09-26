@@ -1,0 +1,10 @@
+/*
+ * All persian-ui styles. The build wraps them in @layer persian-ui
+ * (dist/styles.css) and also ships them unlayered (dist/styles.unlayered.css).
+ */
+@import "./tokens.css";
+@import "./base.css";
+@import "./field.css";
+@import "./price-input.css";
+@import "./calendar.css";
+@import "./date-picker.css";

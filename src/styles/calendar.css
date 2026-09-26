@@ -1,0 +1,155 @@
+.pui-calendar {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: var(--pui-calendar-padding, 0.75rem);
+  border-radius: var(--pui-radius);
+  background: var(--pui-calendar-background, var(--pui-color-surface));
+  color: var(--pui-color-text);
+  font-family: var(--pui-font-family);
+  font-size: var(--pui-font-size);
+}
+
+.pui-calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.pui-calendar__title {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.pui-calendar__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
+  border: 1px solid var(--pui-color-border);
+  border-radius: calc(var(--pui-radius) - 2px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.25em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pui-calendar__nav:hover:not(:disabled) {
+  background: var(--pui-color-hover);
+}
+
+.pui-calendar__nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pui-calendar__select {
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+  border: 1px solid var(--pui-color-border);
+  border-radius: calc(var(--pui-radius) - 2px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.pui-calendar__nav:focus-visible,
+.pui-calendar__select:focus-visible,
+.pui-calendar__day:focus-visible {
+  outline: var(--pui-focus-ring-width) solid var(--pui-color-focus-ring);
+  outline-offset: 1px;
+}
+
+.pui-calendar__gregorian-range {
+  color: var(--pui-color-muted);
+  font-size: 0.8125em;
+  text-align: center;
+}
+
+.pui-calendar__grid {
+  border-collapse: separate;
+  border-spacing: var(--pui-calendar-gap, 2px);
+}
+
+.pui-calendar__grid td {
+  padding: 0;
+  text-align: center;
+}
+
+.pui-calendar__weekday {
+  block-size: 2rem;
+  color: var(--pui-color-muted);
+  font-size: 0.8125em;
+  font-weight: 500;
+  text-align: center;
+}
+
+.pui-calendar__day {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--pui-calendar-cell-size, 2.25rem);
+  block-size: var(--pui-calendar-cell-size, 2.25rem);
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--pui-radius) - 2px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.pui-calendar__day:hover:not([data-disabled]) {
+  background: var(--pui-color-hover);
+}
+
+.pui-calendar__day[data-weekend],
+.pui-calendar__day[data-holiday] {
+  color: var(--pui-color-holiday);
+}
+
+.pui-calendar__day[data-outside] {
+  color: var(--pui-color-muted);
+}
+
+.pui-calendar__day[data-today] {
+  box-shadow: inset 0 0 0 1px var(--pui-color-accent);
+  font-weight: 700;
+}
+
+.pui-calendar__day[data-selected],
+.pui-calendar__day[data-selected]:hover {
+  background: var(--pui-color-accent);
+  color: var(--pui-color-accent-contrast);
+}
+
+.pui-calendar__day[data-disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Holiday dot in the top end corner, clear of both the Jalali and the Gregorian digits. */
+.pui-calendar__day[data-holiday]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.2rem;
+  inset-inline-end: 0.2rem;
+  inline-size: 0.25rem;
+  block-size: 0.25rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pui-calendar__gregorian {
+  font-size: 0.625em;
+  opacity: 0.75;
+}
