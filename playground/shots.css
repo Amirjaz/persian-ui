@@ -1,0 +1,478 @@
+/* README scenes (/?shots). Logical properties only, like the library. */
+body:has(.shots) {
+  background: transparent;
+}
+
+.shots {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3rem;
+  padding: 2rem;
+  font-family: Inter, Vazirmatn, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shots [dir="rtl"] {
+  font-family: Vazirmatn, system-ui, sans-serif;
+}
+
+/* ---- Canvas: soft gradient with a faint dot grid ---- */
+
+.canvas {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  background:
+    radial-gradient(55% 70% at 0% 0%, #dbeafe 0%, transparent 70%),
+    radial-gradient(50% 70% at 100% 100%, #f3e8ff 0%, transparent 70%),
+    radial-gradient(40% 50% at 100% 0%, #e0f2fe 0%, transparent 70%),
+    linear-gradient(160deg, #f8fafc, #f1f5f9);
+}
+
+.canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgb(100 116 139 / 0.18) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+.card {
+  border: 1px solid rgb(15 23 42 / 0.06);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.05),
+    0 18px 40px -12px rgb(15 23 42 / 0.2);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-end: 0.75rem;
+  color: #334155;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.eyebrow code {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.eyebrow__dot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.9);
+}
+
+.eyebrow__dot-blue {
+  background: #2563eb;
+}
+
+.eyebrow__dot-violet {
+  background: #8b5cf6;
+}
+
+.eyebrow__dot-red {
+  background: #ef4444;
+}
+
+.eyebrow__dot-green {
+  background: #22c55e;
+}
+
+.eyebrow__dot-teal {
+  background: #0d9488;
+}
+
+.caption {
+  margin-block: 0.875rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.caption-bad {
+  color: #b91c1c;
+}
+
+.caption-good {
+  color: #15803d;
+}
+
+/* ---- Hero: form → submitted data ---- */
+
+.hero {
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scene-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  inline-size: 30rem;
+  padding: 1.5rem;
+  --pui-font-family: Vazirmatn, system-ui, sans-serif;
+}
+
+.form-card__header h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.form-card__header p {
+  margin-block: 0.25rem 0;
+  color: #64748b;
+  font-size: 0.8125rem;
+}
+
+.form-card__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.form-card__submit {
+  block-size: 2.75rem;
+  border: 0;
+  border-radius: 0.625rem;
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.25) inset,
+    0 6px 16px -4px rgb(37 99 235 / 0.5);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+}
+
+.hero-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-block-start: 2rem;
+  color: #64748b;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+}
+
+.code-card {
+  inline-size: 20.25rem;
+  overflow: hidden;
+  border-color: rgb(255 255 255 / 0.08);
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.code-card__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  border-block-end: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.code-card__bar span {
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
+  border-radius: 50%;
+  background: #334155;
+}
+
+.code-card__bar em {
+  margin-inline-start: auto;
+  color: #94a3b8;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-style: normal;
+}
+
+.code-card pre {
+  margin: 0;
+  padding-block: 1rem;
+  padding-inline: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+.tok-key {
+  color: #93c5fd;
+}
+
+.tok-string {
+  color: #86efac;
+}
+
+.tok-punct {
+  color: #64748b;
+}
+
+.code-card__notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin: 0;
+  padding-block: 0.875rem 1rem;
+  padding-inline: 1rem;
+  border-block-start: 1px solid rgb(255 255 255 / 0.08);
+  list-style: none;
+  color: #cbd5e1;
+  font-size: 0.8125rem;
+}
+
+.code-card__notes li::before {
+  content: "✓";
+  margin-inline-end: 0.5rem;
+  color: #4ade80;
+  font-weight: 700;
+}
+
+/* ---- Side-by-side comparisons ---- */
+
+.pair {
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.trio {
+  align-items: stretch;
+  gap: 1.25rem;
+}
+
+.trio .card {
+  flex: 1;
+}
+
+/* ---- Bidi: an SMS thread ---- */
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  inline-size: 24rem;
+  padding: 1rem;
+}
+
+.chat__header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-block-end: 0.75rem;
+  border-block-end: 1px solid #f1f5f9;
+}
+
+.chat__header strong {
+  display: block;
+  color: #0f172a;
+  font-size: 0.9375rem;
+}
+
+.chat__header small {
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.chat__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.bubble {
+  align-self: flex-start;
+  max-inline-size: 90%;
+  margin: 0;
+  padding-block: 0.5rem;
+  padding-inline: 0.875rem;
+  border-radius: 1rem;
+  border-start-start-radius: 0.25rem;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.broken {
+  color: #b91c1c;
+  text-decoration: underline wavy #ef4444;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+.chat-fixed bdi {
+  color: #15803d;
+  font-weight: 600;
+}
+
+/* ---- Search ---- */
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  inline-size: 23rem;
+  padding: 1rem;
+}
+
+.search__box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  block-size: 2.625rem;
+  padding-inline: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.625rem;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.search__box svg {
+  color: #94a3b8;
+}
+
+.search__caret {
+  inline-size: 1.5px;
+  block-size: 1.2em;
+  margin-inline-start: -0.375rem;
+  background: #2563eb;
+}
+
+.search__count {
+  margin-inline-start: auto;
+  padding-block: 0.125rem;
+  padding-inline: 0.625rem;
+  border-radius: 999px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.search__count-red {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.search__count-green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.search__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search__list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.25rem;
+  border-block-start: 1px solid #f1f5f9;
+  color: #94a3b8;
+}
+
+.search__list li[data-hit] {
+  color: #0f172a;
+}
+
+.search__initial {
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+li[data-hit] .search__initial {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.search__name {
+  flex: 1;
+  font-size: 0.9375rem;
+}
+
+.search__why {
+  padding-block: 0.0625rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.375rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-family: Inter, Vazirmatn, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.search__mark {
+  inline-size: 1.25rem;
+  color: #ef4444;
+  font-weight: 700;
+  text-align: center;
+}
+
+li[data-hit] .search__mark {
+  color: #22c55e;
+}
+
+/* ---- Themes ---- */
+
+.theme-card {
+  display: grid;
+  place-items: center;
+  padding: 0.5rem;
+  --pui-font-family: Vazirmatn, system-ui, sans-serif;
+  --pui-calendar-cell-size: 2rem;
+}
+
+/* The picker's dialog is absolutely positioned: leave room for it. */
+.theme-card-picker {
+  display: block;
+  inline-size: 17.25rem;
+  padding: 1rem;
+  padding-block-end: 23.5rem;
+}
+
+.theme-card-dark {
+  border-color: #27272a;
+  background: #18181b;
+}

@@ -5,12 +5,12 @@ import { describe, expect, it } from "vitest";
 import * as core from "../src/core/index";
 import * as components from "../src/react/index";
 
-/* The README is the reference: it has to mention every CSS variable and export. */
+/* docs/API.md is the reference: it has to mention every CSS variable and export. */
 
 const ROOT = join(import.meta.dirname, "..");
-const readme = readFileSync(join(ROOT, "README.md"), "utf8");
+const reference = readFileSync(join(ROOT, "docs/API.md"), "utf8");
 
-describe("README", () => {
+describe("docs/API.md", () => {
   const styles = readdirSync(join(ROOT, "src/styles"))
     .filter((name) => name.endsWith(".css"))
     .map((name) => readFileSync(join(ROOT, "src/styles", name), "utf8"))
@@ -22,14 +22,14 @@ describe("README", () => {
   });
 
   it.each(variables)("documents %s", (variable) => {
-    expect(readme).toContain(`\`${variable}\``);
+    expect(reference).toContain(`\`${variable}\``);
   });
 
   it.each(Object.keys(core))("documents core export %s", (name) => {
-    expect(readme).toContain(name);
+    expect(reference).toContain(name);
   });
 
   it.each(Object.keys(components))("documents component export %s", (name) => {
-    expect(readme).toContain(name);
+    expect(reference).toContain(name);
   });
 });
