@@ -1,4 +1,4 @@
-import type { Digits } from "@amirjaz/persian-ui/core";
+import { numberToWords, type Digits } from "@amirjaz/persian-ui/core";
 import { forwardRef, useId, useRef, useState, type KeyboardEvent } from "react";
 import { getDirection, useExplicitDirection } from "../direction";
 import { Field, describedBy, hasError } from "../field/Field";
@@ -36,6 +36,11 @@ export interface PriceInputProps extends MaskedInputBaseProps {
   onUnitChange?: (unit: PriceUnit) => void;
   /** Show the toman/rial switch. Default `true`. */
   showUnitToggle?: boolean;
+  /**
+   * Show the amount in words under the field, in the unit being typed:
+   * «یک میلیون و پانصد هزار تومان». Default `false`.
+   */
+  showWords?: boolean;
   labels?: Partial<PriceInputLabels>;
 }
 
@@ -84,6 +89,17 @@ function toToman(significant: string, unit: PriceUnit): number | null {
 const sameAmount = (a: number | null, b: number | null) =>
   a === b || (a !== null && b !== null && Math.abs(a - b) < 1e-9);
 
+/** The typed amount in words; a toman fraction is read as rials: «دوازده تومان و پنج ریال». */
+function amountInWords(significant: string, unit: PriceUnit, labels: PriceInputLabels): string | null {
+  if (significant === "") return null;
+  const [integer = "0", fraction = ""] = significant.split(".");
+  const whole = `${numberToWords(integer)} ${labels[unit]}`;
+  const rial = Number(fraction || "0");
+  if (unit === "rial" || rial === 0) return whole;
+  const rialWords = `${numberToWords(rial)} ${labels.rial}`;
+  return Number(integer) === 0 ? rialWords : `${whole} و ${rialWords}`;
+}
+
 /**
  * Amount input with live thousands separators and a toman/rial switch. The
  * value is always in toman; the switch only changes the unit the user types
@@ -99,6 +115,7 @@ export const PriceInput = forwardRef<HTMLInputElement, PriceInputProps>(function
     defaultUnit = "toman",
     onUnitChange,
     showUnitToggle = true,
+    showWords = false,
     labels: labelsProp,
     onChange,
     label,
@@ -123,6 +140,7 @@ export const PriceInput = forwardRef<HTMLInputElement, PriceInputProps>(function
     hintId: `${generatedId}-hint`,
     errorId: `${generatedId}-error`,
   };
+  const wordsId = `${generatedId}-words`;
   const [unit, setUnit] = useControllableState(unitProp, defaultUnit, onUnitChange);
   // What the user typed, in the unit they typed it in. Keeps states such as "12." intact.
   const [draft, setDraft] = useState(() => ({
@@ -153,6 +171,8 @@ export const PriceInput = forwardRef<HTMLInputElement, PriceInputProps>(function
     if (next !== unit) setUnit(next);
   };
 
+  const words = showWords ? amountInWords(significant, unit, labels) : null;
+
   return (
     <Field
       ids={ids}
@@ -171,6 +191,13 @@ export const PriceInput = forwardRef<HTMLInputElement, PriceInputProps>(function
           <span className="pui-field__affix">{labels[unit]}</span>
         )
       }
+      after={
+        words && (
+          <div id={wordsId} className="pui-price-input__words">
+            {words}
+          </div>
+        )
+      }
     >
       <input
         {...inputProps}
@@ -185,7 +212,8 @@ export const PriceInput = forwardRef<HTMLInputElement, PriceInputProps>(function
         disabled={disabled}
         aria-invalid={hasError(error) || undefined}
         aria-describedby={
-          [ariaDescribedBy, describedBy(ids, hint, error)].filter(Boolean).join(" ") || undefined
+          [ariaDescribedBy, words ? wordsId : null, describedBy(ids, hint, error)].filter(Boolean).join(" ") ||
+          undefined
         }
         onChange={handleChange}
       />

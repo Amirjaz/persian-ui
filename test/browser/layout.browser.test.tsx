@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { PersianCalendar } from "../../src/react/calendar/PersianCalendar";
 import { PersianDatePicker } from "../../src/react/date-picker/PersianDatePicker";
+import { PersianDateRangePicker } from "../../src/react/date-picker/PersianDateRangePicker";
+import { CardNumberInput } from "../../src/react/inputs/CardNumberInput";
 import { ShebaInput } from "../../src/react/inputs/ShebaInput";
 import { PersianText } from "../../src/react/persian-text/PersianText";
 import { PriceInput } from "../../src/react/price-input/PriceInput";
@@ -129,6 +131,45 @@ describe.each(["rtl", "ltr"] as const)("layout in a %s page", (dir) => {
     const affix = rect(document.querySelector(".pui-field__affix")!);
     const input = rect(screen.getByLabelText("شبا"));
     expect(affix.right).toBeLessThanOrEqual(input.left + 1);
+  });
+
+  it("keeps IR on the left and the bank on the right of the Sheba digits", () => {
+    render(
+      <div dir={dir}>
+        <ShebaInput label="شبا" defaultValue="IR000170000000000000000000" />
+      </div>,
+    );
+    const input = rect(screen.getByLabelText("شبا"));
+    const bank = rect(document.querySelector(".pui-field__bank")!);
+    expect(bank.left).toBeGreaterThanOrEqual(input.right - 1);
+  });
+
+  it("puts the card's bank at the end of the field", () => {
+    render(
+      <div dir={dir}>
+        <CardNumberInput label="کارت" defaultValue="603799" />
+      </div>,
+    );
+    const input = rect(screen.getByLabelText("کارت"));
+    const bank = rect(document.querySelector(".pui-field__bank")!);
+    if (rtl) expect(bank.right).toBeLessThanOrEqual(input.left + 1);
+    else expect(bank.left).toBeGreaterThanOrEqual(input.right - 1);
+  });
+
+  it("puts the range's start input first in reading order, and opens aligned", () => {
+    render(
+      <div dir={dir} style={{ padding: "0 200px" }}>
+        <PersianDateRangePicker label="سفر" defaultOpen />
+      </div>,
+    );
+    const start = rect(screen.getByRole("textbox", { name: "سفر از" }));
+    const end = rect(screen.getByRole("textbox", { name: "سفر تا" }));
+    if (rtl) expect(start.left).toBeGreaterThan(end.left);
+    else expect(start.left).toBeLessThan(end.left);
+    const control = rect(document.querySelector(".pui-field__control")!);
+    const popup = rect(screen.getByRole("dialog"));
+    if (rtl) expect(Math.abs(popup.right - control.right)).toBeLessThan(1);
+    else expect(Math.abs(popup.left - control.left)).toBeLessThan(1);
   });
 
   it("puts the price unit switch at the end of the field", () => {

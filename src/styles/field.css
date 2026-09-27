@@ -71,6 +71,16 @@
   user-select: none;
 }
 
+/* The detected bank's name: gives way to the digits in narrow fields. */
+.pui-field__bank {
+  flex-shrink: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: 0.8125em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .pui-field__hint {
   color: var(--pui-color-muted);
   font-size: 0.875em;

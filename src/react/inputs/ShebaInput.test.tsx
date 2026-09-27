@@ -50,7 +50,39 @@ describe("ShebaInput", () => {
     const { user, input } = setup();
     const wrong = DIGITS.slice(0, 23) + String((Number(DIGITS[23]) + 1) % 10);
     await user.type(input, wrong);
-    expect(input).toHaveAccessibleDescription(validationMessages.sheba.checksum);
+    // The bank (from the code after the check digits) is described first, then the error.
+    expect(input).toHaveAccessibleDescription(`بانک ملت ${validationMessages.sheba.checksum}`);
+  });
+
+  describe("bank", () => {
+    it("names the bank at the end of the field once its code is typed", async () => {
+      const { user, input, container } = setup({ digits: "en" });
+      await user.type(input, DIGITS.slice(0, 4));
+      expect(container.querySelector(".pui-field__bank")).toBeNull();
+      await user.type(input, DIGITS.slice(4, 5));
+      const bank = container.querySelector(".pui-field__bank")!;
+      expect(bank).toHaveTextContent("بانک ملت");
+      expect(container.querySelector(".pui-field__control")!.lastElementChild).toBe(bank);
+      expect(container.querySelector(".pui-field")).toHaveAttribute("data-bank", "mellat");
+      expect(input).toHaveAccessibleDescription("بانک ملت");
+    });
+
+    it("names the current bank for accounts of a merged bank", () => {
+      const { container } = setup({ defaultValue: shebaFromBban("0630000000000000000123") });
+      expect(container.querySelector(".pui-field__bank")).toHaveTextContent("بانک سپه");
+      expect(container.querySelector(".pui-field")).toHaveAttribute("data-bank", "sepah");
+    });
+
+    it("shows nothing for unknown codes or with showBank={false}", () => {
+      const unknown = setup({ defaultValue: shebaFromBban("0990000000000000000123") });
+      expect(unknown.container.querySelector(".pui-field__bank")).toBeNull();
+      expect(unknown.container.querySelector(".pui-field")).not.toHaveAttribute("data-bank");
+      unknown.unmount();
+
+      const hidden = setup({ defaultValue: IBAN, showBank: false });
+      expect(hidden.container.querySelector(".pui-field__bank")).toBeNull();
+      expect(hidden.container.querySelector(".pui-field")).not.toHaveAttribute("data-bank");
+    });
   });
 
   it("reports an empty value once cleared", async () => {

@@ -1,4 +1,5 @@
 import {
+  getBankFromSheba,
   validateSheba,
   validationMessages,
   type ShebaInvalidReason,
@@ -6,9 +7,14 @@ import {
 } from "@amirjaz/persian-ui/core";
 import { forwardRef } from "react";
 import { digitGroupsMask } from "../field/mask";
-import { ValidatedInput, type ValidatedInputConfig, type ValidatedInputProps } from "../field/ValidatedInput";
+import {
+  ValidatedInput,
+  type BankInputProps,
+  type ValidatedInputConfig,
+  type ValidatedInputProps,
+} from "../field/ValidatedInput";
 
-export type ShebaInputProps = ValidatedInputProps<ShebaResult, ShebaInvalidReason>;
+export type ShebaInputProps = ValidatedInputProps<ShebaResult, ShebaInvalidReason> & BankInputProps;
 
 const config: ValidatedInputConfig<ShebaResult, ShebaInvalidReason> = {
   className: "pui-sheba-input",
@@ -28,12 +34,15 @@ const config: ValidatedInputConfig<ShebaResult, ShebaInvalidReason> = {
       IR
     </span>
   ),
+  // The bank code follows the two check digits.
+  detectBank: (digits) => getBankFromSheba(digits),
 };
 
 /**
  * Input for an Iranian IBAN (شماره شبا). "IR" is shown as a fixed prefix; the
  * user types or pastes the 24 digits in any script. The value is the full
- * number, e.g. "IR06…", validated with the ISO 13616 checksum.
+ * number, e.g. "IR06…", validated with the ISO 13616 checksum. The bank's name
+ * appears at the end of the field once its code is typed (`showBank`).
  */
 export const ShebaInput = forwardRef<HTMLInputElement, ShebaInputProps>(function ShebaInput(props, ref) {
   return <ValidatedInput {...props} config={config} inputRef={ref} />;

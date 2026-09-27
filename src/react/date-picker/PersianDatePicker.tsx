@@ -1,15 +1,5 @@
-import { formatJalali, parseJalali, toEnglishDigits, toGregorian, toJalali, type JalaliDate } from "@amirjaz/persian-ui/core";
-import {
-  forwardRef,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { formatJalali, toGregorian, toJalali } from "@amirjaz/persian-ui/core";
+import { forwardRef, useId, useState, type ReactElement, type ReactNode } from "react";
 import {
   PersianCalendar,
   type CalendarClassNames,
@@ -22,6 +12,16 @@ import { useExplicitDirection } from "../direction";
 import { Field, describedBy, hasError } from "../field/Field";
 import { Slot } from "../slot";
 import { cx, useControllableState } from "../utils";
+import {
+  CalendarIcon,
+  DEFAULT_DATE_PICKER_MESSAGES,
+  dateProblem,
+  parseTyped,
+  useCalendarDialog,
+  type DatePickerMessages,
+} from "./shared";
+
+export type { DatePickerMessages } from "./shared";
 
 export interface DatePickerLabels extends CalendarLabels {
   /** Accessible name of the button that opens the calendar. */
@@ -30,16 +30,6 @@ export interface DatePickerLabels extends CalendarLabels {
   dialog: string;
   today: string;
   clear: string;
-}
-
-export interface DatePickerMessages {
-  required: string;
-  /** The typed text isn't a date. */
-  invalid: string;
-  /** The typed date is before `min` or after `max`. */
-  outOfRange: string;
-  /** The typed date is excluded by `isDateDisabled`. */
-  unavailable: string;
 }
 
 export interface DatePickerClassNames extends CalendarClassNames {
@@ -85,26 +75,6 @@ const DEFAULT_LABELS: DatePickerLabels = {
   today: "امروز",
   clear: "پاک کردن",
 };
-
-const DEFAULT_MESSAGES: DatePickerMessages = {
-  required: "تاریخ را وارد کنید.",
-  invalid: "تاریخ معتبر نیست. نمونه: ۱۴۰۴/۰۱/۱۵",
-  outOfRange: "این تاریخ خارج از بازهٔ مجاز است.",
-  unavailable: "این تاریخ قابل انتخاب نیست.",
-};
-
-const FOCUSABLE = 'button:not([disabled]):not([tabindex="-1"]), select:not([disabled]), [tabindex="0"]';
-
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
-
-/** Reads «۱۴۰۴/۰۱/۱۵», «1404-1-15» and, for number-only keyboards, «14040115». */
-function parseTyped(text: string): JalaliDate | null {
-  const compact = toEnglishDigits(text).trim();
-  if (/^\d{8}$/.test(compact)) {
-    return parseJalali(`${compact.slice(0, 4)}/${compact.slice(4, 6)}/${compact.slice(6)}`);
-  }
-  return parseJalali(text);
-}
 
 function detailsOf(iso: string | null): DateChangeDetails {
   return iso === null ? { jalali: null, date: null } : { jalali: toJalali(iso), date: isoToLocalDate(iso) };
@@ -157,7 +127,7 @@ export const PersianDatePicker = forwardRef<HTMLInputElement, PersianDatePickerP
     ref,
   ) {
     const labels = { ...DEFAULT_LABELS, ...labelsProp };
-    const messages = { ...DEFAULT_MESSAGES, ...messagesProp };
+    const messages = { ...DEFAULT_DATE_PICKER_MESSAGES, ...messagesProp };
     const explicitDir = useExplicitDirection(dir);
     const generatedId = useId();
     const ids = {
@@ -174,10 +144,7 @@ export const PersianDatePicker = forwardRef<HTMLInputElement, PersianDatePickerP
     const [shownValue, setShownValue] = useState(value);
     const [entryError, setEntryError] = useState<keyof DatePickerMessages | null>(null);
     const [touched, setTouched] = useState(false);
-    const [side, setSide] = useState<"bottom" | "top">("bottom");
-    const rootRef = useRef<HTMLDivElement>(null);
-    const triggerRef = useRef<HTMLButtonElement>(null);
-    const popupRef = useRef<HTMLDivElement>(null);
+    const { rootRef, triggerRef, popupRef, side, close, handleDialogKeyDown } = useCalendarDialog(open, setOpen);
 
     // The value changed from outside (or from the calendar): show it in the field.
     if (value !== shownValue) {
@@ -186,10 +153,7 @@ export const PersianDatePicker = forwardRef<HTMLInputElement, PersianDatePickerP
       setEntryError(null);
     }
 
-    const problemWith = (iso: string): keyof DatePickerMessages | null => {
-      if ((min !== undefined && iso < min) || (max !== undefined && iso > max)) return "outOfRange";
-      return isDateDisabled?.(iso) ? "unavailable" : null;
-    };
+    const problemWith = (iso: string) => dateProblem(iso, min, max, isDateDisabled);
 
     const commit = (iso: string | null) => {
       setEntryError(null);
@@ -208,55 +172,6 @@ export const PersianDatePicker = forwardRef<HTMLInputElement, PersianDatePickerP
       const problem = problemWith(iso);
       if (problem) return setEntryError(problem);
       commit(iso);
-    };
-
-    const close = () => {
-      setOpen(false);
-      triggerRef.current?.focus();
-    };
-
-    // Close when the user clicks or taps outside the field.
-    useEffect(() => {
-      if (!open) return;
-      const document = rootRef.current?.ownerDocument;
-      const onPointerDown = (event: PointerEvent) => {
-        if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-      };
-      document?.addEventListener("pointerdown", onPointerDown);
-      return () => document?.removeEventListener("pointerdown", onPointerDown);
-    }, [open, setOpen]);
-
-    // Open upwards when there isn't room below.
-    useIsomorphicLayoutEffect(() => {
-      const popup = popupRef.current;
-      const control = popup?.parentElement;
-      if (!open || !popup || !control) return;
-      const room = control.getBoundingClientRect();
-      const below = popup.ownerDocument.defaultView!.innerHeight - room.bottom;
-      const height = popup.getBoundingClientRect().height;
-      setSide(below < height && room.top > below ? "top" : "bottom");
-    }, [open]);
-
-    const handleDialogKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        event.stopPropagation();
-        close();
-        return;
-      }
-      if (event.key !== "Tab") return;
-      // Keep focus inside the dialog while it is open.
-      const focusables = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE));
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const active = event.currentTarget.ownerDocument.activeElement;
-      if (event.shiftKey && active === first) {
-        event.preventDefault();
-        last?.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first?.focus();
-      }
     };
 
     const today = todayIso();
@@ -406,24 +321,3 @@ export const PersianDatePicker = forwardRef<HTMLInputElement, PersianDatePickerP
     );
   },
 );
-
-function CalendarIcon() {
-  return (
-    <svg
-      className="pui-date-picker__icon"
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4M8 2v4M3 10h18" />
-    </svg>
-  );
-}
