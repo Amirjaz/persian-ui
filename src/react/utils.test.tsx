@@ -61,8 +61,12 @@ describe("Slot", () => {
   });
 
   it("requires exactly one element", () => {
+    // React logs the expected error, and React 18 also re-throws it as a window error event.
+    const silence = (event: ErrorEvent) => event.preventDefault();
+    window.addEventListener("error", silence);
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Slot>{"text" as never}</Slot>)).toThrow();
     vi.restoreAllMocks();
+    window.removeEventListener("error", silence);
   });
 });

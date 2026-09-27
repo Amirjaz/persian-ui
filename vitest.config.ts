@@ -21,6 +21,8 @@ export default defineConfig({
     env: { TZ: "Asia/Tehran" },
     // axe-core accessibility scans are slow in jsdom, especially with projects running in parallel.
     testTimeout: 15_000,
+    // Four projects plus a real browser at once starve worker start-up on an 8-core machine.
+    maxWorkers: 4,
     projects: [
       {
         extends: true,

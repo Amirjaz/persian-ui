@@ -13,6 +13,7 @@ import {
   ShebaInput,
   type Direction,
 } from "../src/react";
+import { Shots } from "./shots";
 
 /** Dev-only page: every component, right-to-left and left-to-right side by side. */
 function Column({ dir }: { dir: Direction }) {
@@ -43,9 +44,13 @@ function Column({ dir }: { dir: Direction }) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <main className="playground">
-      <Column dir="rtl" />
-      <Column dir="ltr" />
-    </main>
+    {new URLSearchParams(location.search).has("shots") ? (
+      <Shots />
+    ) : (
+      <main className="playground">
+        <Column dir="rtl" />
+        <Column dir="ltr" />
+      </main>
+    )}
   </StrictMode>,
 );

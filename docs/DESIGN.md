@@ -34,6 +34,10 @@ validators for Iranian identifiers.
 | `@amirjaz/persian-ui/styles.css` | all component styles in `@layer persian-ui` | |
 | `@amirjaz/persian-ui/styles.unlayered.css` | same, without `@layer` | for browsers older than Chrome 99 / Safari 15.4 / Firefox 97 |
 
+A `core/package.json` stub points old resolvers (TypeScript `moduleResolution: node`,
+older bundlers) at `dist/core`; publint and attw check every resolution mode.
+First release: 0.1.0.
+
 ## Core API
 
 - `toPersianDigits`, `toEnglishDigits` — Latin, Persian (۰-۹) and Arabic-Indic (٠-٩) digits.
