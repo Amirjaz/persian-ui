@@ -132,6 +132,13 @@
   color: var(--pui-color-accent-contrast);
 }
 
+/* The days of a range between its start and end, and the preview while the end is picked. */
+.pui-calendar__day[data-in-range],
+.pui-calendar__day[data-range-preview],
+.pui-calendar__day[data-range-preview]:hover:not([data-disabled]) {
+  background: var(--pui-color-range);
+}
+
 .pui-calendar__day[data-disabled] {
   opacity: 0.35;
   cursor: not-allowed;

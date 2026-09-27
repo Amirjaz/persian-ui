@@ -34,3 +34,20 @@ export const GREGORIAN_MONTH_NAMES = [
   "نوامبر",
   "دسامبر",
 ] as const;
+
+/** Texts used by the range calendar and range picker, on top of the calendar's. */
+export interface RangeCalendarLabels extends CalendarLabels {
+  /** Appended to the start day's accessible name. */
+  rangeStart: string;
+  /** Appended to the end day's accessible name. */
+  rangeEnd: string;
+  /** Announced once the start is picked. */
+  selectEnd: string;
+}
+
+export const DEFAULT_RANGE_CALENDAR_LABELS: RangeCalendarLabels = {
+  ...DEFAULT_CALENDAR_LABELS,
+  rangeStart: "آغاز بازه",
+  rangeEnd: "پایان بازه",
+  selectEnd: "تاریخ پایان را انتخاب کنید.",
+};

@@ -32,3 +32,8 @@
 .pui-price-input__unit:disabled {
   cursor: not-allowed;
 }
+
+.pui-price-input__words {
+  color: var(--pui-color-muted);
+  font-size: 0.875em;
+}

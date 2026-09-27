@@ -3,14 +3,18 @@ import "./playground.css";
 import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
+  CardNumberInput,
   DirectionProvider,
   MobileInput,
   NationalIdInput,
   PersianCalendar,
   PersianDatePicker,
+  PersianDateRangePicker,
+  PersianRangeCalendar,
   PersianText,
   PriceInput,
   ShebaInput,
+  type DateRange,
   type Direction,
 } from "../src/react";
 import { Shots } from "./shots";
@@ -19,6 +23,7 @@ import { Shots } from "./shots";
 function Column({ dir }: { dir: Direction }) {
   const [price, setPrice] = useState<number | null>(1250000);
   const [date, setDate] = useState<string | null>("2025-04-04");
+  const [range, setRange] = useState<DateRange>({ start: "2025-03-21", end: "2025-03-25" });
   return (
     <DirectionProvider dir={dir}>
       <section className="column" dir={dir}>
@@ -32,10 +37,16 @@ function Column({ dir }: { dir: Direction }) {
         <NationalIdInput label="کد ملی" hint="ده رقم روی کارت ملی" required />
         <MobileInput label="تلفن همراه" />
         <ShebaInput label="شماره شبا" />
-        <PriceInput label="مبلغ" value={price} onValueChange={setPrice} />
+        <CardNumberInput label="شماره کارت" />
+        <PriceInput label="مبلغ" value={price} onValueChange={setPrice} showWords />
         <output className="note">value: {String(price)} toman</output>
         <PersianDatePicker label="تاریخ تولد" value={date} onValueChange={setDate} showGregorian />
         <output className="note">value: {String(date)}</output>
+        <PersianDateRangePicker label="تاریخ سفر" value={range} onValueChange={setRange} />
+        <output className="note">
+          value: {String(range.start)} → {String(range.end)}
+        </output>
+        <PersianRangeCalendar defaultValue={{ start: "2025-03-21", end: "2025-03-25" }} />
         <PersianCalendar defaultValue="2025-03-21" showGregorian />
       </section>
     </DirectionProvider>

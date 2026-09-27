@@ -6,6 +6,8 @@ export interface FieldIds {
   inputId: string;
   hintId: string;
   errorId: string;
+  /** Set when inputs are labelled with `aria-labelledby` (the range picker's two inputs). */
+  labelId?: string;
 }
 
 interface FieldProps {
@@ -20,6 +22,10 @@ interface FieldProps {
   controlDir?: Direction;
   start?: ReactNode;
   end?: ReactNode;
+  /** Shown between the control row and the hint, e.g. an amount in words. */
+  after?: ReactNode;
+  /** `data-*` attributes for the root, e.g. `data-bank`. */
+  data?: Record<`data-${string}`, string | undefined>;
   /** Hidden input carrying the normalized value for native form submission. */
   name?: string | undefined;
   submitValue: string;
@@ -49,6 +55,8 @@ export function Field({
   controlDir,
   start,
   end,
+  after,
+  data,
   name,
   submitValue,
   disabled,
@@ -58,6 +66,7 @@ export function Field({
   const invalid = hasError(error);
   return (
     <div
+      {...data}
       ref={rootRef}
       className={cx("pui-field", className)}
       dir={dir}
@@ -65,7 +74,7 @@ export function Field({
       data-disabled={disabled || undefined}
     >
       {label != null && (
-        <label className="pui-field__label" htmlFor={ids.inputId}>
+        <label id={ids.labelId} className="pui-field__label" htmlFor={ids.inputId}>
           {label}
         </label>
       )}
@@ -74,6 +83,7 @@ export function Field({
         {children}
         {end}
       </div>
+      {after}
       {hint != null && (
         <div id={ids.hintId} className="pui-field__hint">
           {hint}

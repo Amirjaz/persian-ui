@@ -286,10 +286,10 @@ It isolates phone numbers, ranges («۱۰-۲۰»), dates, grouped numbers
 («۱٬۲۵۰٬۰۰۰»), versions, e-mail addresses and URLs, while keeping a sentence's
 closing punctuation with the sentence.
 
-### Masked inputs: `NationalIdInput`, `MobileInput`, `ShebaInput`
+### Masked inputs: `NationalIdInput`, `MobileInput`, `ShebaInput`, `CardNumberInput`
 
 ```tsx
-import { MobileInput, NationalIdInput, ShebaInput } from "@amirjaz/persian-ui";
+import { CardNumberInput, MobileInput, NationalIdInput, ShebaInput } from "@amirjaz/persian-ui";
 
 <NationalIdInput
   label="کد ملی"
@@ -302,6 +302,8 @@ import { MobileInput, NationalIdInput, ShebaInput } from "@amirjaz/persian-ui";
 <MobileInput label="تلفن همراه" onValueChange={(value, result) => result.valid && result.operator} />
 
 <ShebaInput label="شماره شبا" hint="۲۴ رقم بعد از IR" />
+
+<CardNumberInput label="شماره کارت" onValueChange={(value, result) => result.valid && result.bank?.name} />
 ```
 
 They format while the user types or pastes, in any digit script:
@@ -311,6 +313,7 @@ They format while the user types or pastes, in any digit script:
 | `NationalIdInput` | ۰۰۱-۲۳۴۵۶۷-۸ | `"0012345678"` |
 | `MobileInput` | ۰۹۱۲ ۳۴۵ ۶۷۸۹ (also from pasted `+98 …` or `0098 …`) | `"09123456789"` |
 | `ShebaInput` | IR ۰۶ ۰۱۲۰ ۰۰۰۰ … (IR is a fixed prefix) | `"IR06012…"` |
+| `CardNumberInput` | ۶۰۳۷ ۹۹۰۰ … in groups of four | `"603799…"` (16 digits) |
 
 The caret stays next to the digit being edited while separators come and go, and
 Backspace or Delete next to a separator removes the neighbouring digit instead of
@@ -332,6 +335,21 @@ Shared props:
 
 With react-hook-form, use a `Controller` and `onValueChange`.
 
+**Banks.** `CardNumberInput` and `ShebaInput` name the bank at the end of the field
+as soon as the number tells it (a card's first six digits, a Sheba's three-digit bank
+code), include it in the input's description, and set `data-bank` (the bank's `id`)
+on the root. The library ships no logos, but you can add your own with CSS:
+
+```css
+.pui-field[data-bank="melli"] .pui-field__bank::before {
+  content: url("/banks/melli.svg");
+}
+```
+
+Cards and accounts of merged banks show the bank that serves them today (see
+[Banks](#banks)). `showBank={false}` turns this off. `CardNumberInput` also sets
+`autocomplete="cc-number"`, so browsers can fill in saved cards.
+
 ### `PriceInput`
 
 ```tsx
@@ -351,6 +369,10 @@ typing ۱٬۵۰۰ in rial gives `150` toman. Rial amounts that aren't a multiple
 keep their fraction (`12345` rial → `1234.5` toman). Other props: `value`,
 `defaultValue`, `unit`, `defaultUnit`, `onUnitChange`, `showUnitToggle`, and
 `labels` for the unit names, plus the shared props above.
+
+`showWords` adds the amount in words under the field, in the unit being typed
+(«یک میلیون و پانصد هزار تومان»; a fractional toman reads «دوازده تومان و پنج
+ریال»), and includes it in the input's description.
 
 ### `PersianDatePicker`
 
@@ -414,6 +436,49 @@ Month changes are announced to screen readers, each day is announced with its
 full date and holiday («جمعه ۱ فروردین ۱۴۰۴، تعطیل: نوروز»), and today is marked
 with `aria-current="date"`.
 
+### `PersianDateRangePicker` and `PersianRangeCalendar`
+
+```tsx
+import { PersianDateRangePicker, type DateRange } from "@amirjaz/persian-ui";
+
+const [trip, setTrip] = useState<DateRange>({ start: null, end: null });
+
+<PersianDateRangePicker
+  label="تاریخ سفر"
+  value={trip}
+  onValueChange={(range, { start, end }) => setTrip(range)}
+  min="2025-03-21"
+  startName="checkIn"
+  endName="checkOut"
+/>;
+```
+
+One field with two inputs, «از» and «تا», and one calendar button. Each input
+takes typed dates like `PersianDatePicker`; an end before the start is reported
+(`order` message) instead of committed. In the calendar, the first click sets the
+start and the dialog stays open, showing the range up to the hovered or focused
+day; the next click on or after the start sets the end and closes the dialog, and a
+click before the start starts over from that day. A range may include disabled
+days.
+
+- The value is `{ start, end }` with ISO dates or `null` (empty is
+  `{ start: null, end: null }`); `onValueChange(range, { start, end })` fires on every
+  change, including a start without an end, and also gives each day's Jalali date
+  and `Date`.
+- `startName` / `endName` submit the two ISO dates with native forms.
+- `required` asks for both dates. `showFooter` shows the Clear button.
+- The other props match `PersianDatePicker`: `min`, `max`, `isDateDisabled`,
+  `showGregorian`, `showHolidays`, `digits`, `weekStartsOn`, `month`,
+  `yearRange`, `open`, `asChild`, `labels` (plus `from`, `to`, `rangeStart`,
+  `rangeEnd`, `selectEnd`), `messages` (plus `order`) and `classNames` (plus
+  `startInput`, `endInput`, `dayRangeStart`, `dayInRange`, `dayRangeEnd`,
+  `dayRangePreview`).
+
+`PersianRangeCalendar` is the range calendar on its own. The start and end days are
+announced as «آغاز بازه» and «پایان بازه», every day of the range is
+`aria-selected`, and «تاریخ پایان را انتخاب کنید.» is announced once the start is
+picked.
+
 ---
 
 ## Styling
@@ -422,8 +487,10 @@ with `aria-current="date"`.
 yours that isn't in a layer wins, whatever its specificity. Selectors are single
 classes (`.pui-calendar__day`), and state is exposed as data attributes
 (`[data-selected]`, `[data-today]`, `[data-disabled]`, `[data-outside]`,
-`[data-weekend]`, `[data-holiday]`, `[data-invalid]`, `[data-side]`), which you can
-target from plain CSS or Tailwind (`data-[selected]:bg-…`).
+`[data-weekend]`, `[data-holiday]`, `[data-invalid]`, `[data-side]`,
+`[data-range-start]`, `[data-in-range]`, `[data-range-end]`, `[data-range-preview]`,
+`[data-bank]`), which you can target from plain CSS or Tailwind
+(`data-[selected]:bg-…`).
 
 **Tailwind CSS v4:** declare the layer order first, so your utility classes also
 beat the library's styles:
@@ -458,6 +525,7 @@ own: they fall back to a global one, so setting them anywhere just works.
 | `--pui-color-hover` | `#f4f4f5` | Hover background, unit switch |
 | `--pui-color-accent` | `#2563eb` | Selected day, today, primary button |
 | `--pui-color-accent-contrast` | `#ffffff` | Text on the accent colour |
+| `--pui-color-range` | `#dbeafe` | Days inside a date range, and its preview |
 | `--pui-color-danger` | `#b91c1c` | Errors and invalid borders |
 | `--pui-color-holiday` | `#b91c1c` | Fridays and holidays |
 | `--pui-color-focus-ring` | `#2563eb` | Focus outlines |
@@ -497,6 +565,7 @@ own: they fall back to a global one, so setting them anywhere just works.
   --pui-color-accent: #3b82f6;
   --pui-color-danger: #f87171;
   --pui-color-holiday: #f87171;
+  --pui-color-range: #1e3a8a;
   --pui-color-focus-ring: #60a5fa;
 }
 ```

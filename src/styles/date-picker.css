@@ -67,6 +67,13 @@
   color: var(--pui-color-accent-contrast);
 }
 
+/* The range picker's only footer button is Clear: not a primary action. */
+.pui-date-range-picker .pui-date-picker__footer-button:first-child {
+  border-color: var(--pui-color-border);
+  background: transparent;
+  color: inherit;
+}
+
 .pui-date-picker__footer-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;

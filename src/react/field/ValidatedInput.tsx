@@ -1,4 +1,4 @@
-import type { Digits, ValidationResult } from "@amirjaz/persian-ui/core";
+import type { Digits, IranianBank, ValidationResult } from "@amirjaz/persian-ui/core";
 import {
   useId,
   useState,
@@ -60,6 +60,17 @@ export interface ValidatedInputConfig<TResult, TReason extends string> {
   fromValue?: (value: string) => string;
   controlDir?: Direction;
   start?: ReactNode;
+  /** Finds the bank from a partial value; enables the `showBank` prop. */
+  detectBank?: (significant: string) => IranianBank | null;
+}
+
+/** For inputs that can name the bank (cards, Sheba). */
+export interface BankInputProps {
+  /**
+   * Show the bank's name at the end of the field as soon as the number tells it,
+   * and set `data-bank` (the bank's id) on the root for styling. Default `true`.
+   */
+  showBank?: boolean;
 }
 
 const identity = (value: string) => value;
@@ -84,12 +95,14 @@ export function ValidatedInput<TResult extends ValidationResult<object, TReason>
   required,
   disabled,
   autoComplete,
+  showBank = true,
   "aria-describedby": ariaDescribedBy,
   ...inputProps
-}: ValidatedInputProps<TResult, TReason> & {
-  config: ValidatedInputConfig<TResult, TReason>;
-  inputRef: Ref<HTMLInputElement>;
-}) {
+}: ValidatedInputProps<TResult, TReason> &
+  BankInputProps & {
+    config: ValidatedInputConfig<TResult, TReason>;
+    inputRef: Ref<HTMLInputElement>;
+  }) {
   const { toValue = identity, fromValue = identity } = config;
   const explicitDir = useExplicitDirection(dir);
   const generatedId = useId();
@@ -98,6 +111,7 @@ export function ValidatedInput<TResult extends ValidationResult<object, TReason>
     hintId: `${generatedId}-hint`,
     errorId: `${generatedId}-error`,
   };
+  const bankId = `${generatedId}-bank`;
   const [value, setValue] = useControllableState(valueProp, defaultValue);
   const [touched, setTouched] = useState(false);
   const significant = fromValue(value);
@@ -124,6 +138,7 @@ export function ValidatedInput<TResult extends ValidationResult<object, TReason>
       ? (messages?.[reason] ?? config.defaultMessages[reason])
       : null;
   const invalid = hasError(message);
+  const bank = showBank && config.detectBank ? config.detectBank(significant) : null;
 
   return (
     <Field
@@ -135,6 +150,14 @@ export function ValidatedInput<TResult extends ValidationResult<object, TReason>
       className={cx(config.className, className)}
       controlDir={config.controlDir}
       start={config.start}
+      end={
+        bank && (
+          <span id={bankId} className="pui-field__affix pui-field__bank" dir="rtl">
+            {bank.name}
+          </span>
+        )
+      }
+      data={{ "data-bank": bank?.id }}
       name={name}
       submitValue={value}
       disabled={disabled}
@@ -153,7 +176,8 @@ export function ValidatedInput<TResult extends ValidationResult<object, TReason>
         disabled={disabled}
         aria-invalid={invalid || undefined}
         aria-describedby={
-          [ariaDescribedBy, describedBy(ids, hint, message)].filter(Boolean).join(" ") || undefined
+          [ariaDescribedBy, bank ? bankId : null, describedBy(ids, hint, message)].filter(Boolean).join(" ") ||
+          undefined
         }
         onChange={handleChange}
         onBlur={(event) => {

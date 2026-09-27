@@ -164,6 +164,52 @@ describe("PriceInput", () => {
     expect(input).toHaveAccessibleDescription("حداقل مبلغ ۱۰۰۰ تومان است");
   });
 
+  describe("amount in words", () => {
+    const words = (container: HTMLElement) => container.querySelector(".pui-price-input__words");
+
+    it("is off by default", async () => {
+      const { user, input, container } = setup();
+      await user.type(input, "1500");
+      expect(words(container)).toBeNull();
+    });
+
+    it("follows the typed amount in the unit being typed", async () => {
+      const { user, input, container } = setup({ showWords: true });
+      expect(words(container)).toBeNull();
+      await user.type(input, "1500000");
+      expect(words(container)).toHaveTextContent("یک میلیون و پانصد هزار تومان");
+      expect(input).toHaveAccessibleDescription("یک میلیون و پانصد هزار تومان");
+      await user.click(screen.getByRole("radio", { name: "ریال" }));
+      expect(words(container)).toHaveTextContent("پانزده میلیون ریال");
+      await user.clear(input);
+      expect(words(container)).toBeNull();
+      expect(input).not.toHaveAttribute("aria-describedby");
+    });
+
+    it.each([
+      ["12.5", "دوازده تومان و پنج ریال"],
+      ["0.5", "پنج ریال"],
+      ["12.", "دوازده تومان"],
+      ["0", "صفر تومان"],
+    ])("reads %s toman as «%s»", async (typed, expected) => {
+      const { user, input, container } = setup({ showWords: true, digits: "en" });
+      await user.type(input, typed);
+      expect(words(container)).toHaveTextContent(expected);
+    });
+
+    it("uses the unit labels and sits between the field and the hint", () => {
+      const { container, input } = setup({
+        showWords: true,
+        defaultValue: 2000,
+        hint: "حداقل ۱۰۰۰ تومان",
+        labels: { toman: "تومن" },
+      });
+      expect(words(container)).toHaveTextContent("دو هزار تومن");
+      expect(container.querySelector(".pui-field__control")!.nextElementSibling).toBe(words(container));
+      expect(input).toHaveAccessibleDescription("دو هزار تومن حداقل ۱۰۰۰ تومان");
+    });
+  });
+
   describe.each(DIRECTION_SETUPS)("in a $name", (direction) => {
     it("moves between units with the arrow key pointing the reading direction", async () => {
       const user = userEvent.setup();
