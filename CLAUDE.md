@@ -29,8 +29,9 @@ lives in `docs/DESIGN.md`; follow it, and ask the maintainer before changing it.
 - `pnpm check:dist` (built output and a server render of it), `pnpm check:package`
   (publint + attw).
 - `pnpm typecheck`, `pnpm lint`, `pnpm check` (everything; also runs before `npm publish`).
-- README images: `pnpm dev`, then `node scripts/screenshots.mjs`. Check bidi and arrow
-  direction by measuring (Range rects), not by eye.
+- README images: `pnpm dev`, then `node scripts/screenshots.mjs` (set `PORT` if the
+  playground isn't on 5199). The scenes live in `playground/shots.tsx` (`/?shots`).
+  Check bidi and arrow direction by measuring (Range rects), not by eye.
 - Installs: pnpm may need `--config.confirm-modules-purge=false` when run non-interactively.
 
 ## Rules that are easy to break
@@ -49,7 +50,7 @@ lives in `docs/DESIGN.md`; follow it, and ask the maintainer before changing it.
 - Components must render on the server (no `window`/`document` during render):
   `src/react/ssr.test.tsx` checks this.
 - TypeScript is pinned to 6.0.x on purpose (tsup can't build declarations with TS 7).
-- `test/docs.test.ts` fails if the README misses a CSS variable or a public export:
-  document new ones there.
+- The README is a short pitch; the full reference is `docs/API.md`. `test/docs.test.ts`
+  fails if `docs/API.md` misses a CSS variable or a public export: document new ones there.
 - README images use absolute raw.githubusercontent.com URLs for
   github.com/Amirjaz/persian-ui (main) so they also render on npm.

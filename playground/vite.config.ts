@@ -11,5 +11,5 @@ export default defineConfig({
       "@amirjaz/persian-ui/core": fileURLToPath(new URL("../src/core/index.ts", import.meta.url)),
     },
   },
-  server: { port: 5199 },
+  server: { port: Number(process.env.PORT) || 5199 },
 });
