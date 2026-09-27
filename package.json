@@ -1,7 +1,7 @@
 {
   "name": "@amirjaz/persian-ui",
-  "version": "0.1.0",
-  "description": "Persian-first React components and utilities: RTL-correct inputs, a Jalali date picker, and validators for Iranian data.",
+  "version": "0.2.0",
+  "description": "Persian-first React components and utilities: RTL-correct inputs, Jalali date and range pickers, bank card and Sheba inputs with bank detection, and validators for Iranian data.",
   "license": "MIT",
   "author": "Amirjaz",
   "homepage": "https://github.com/Amirjaz/persian-ui#readme",
@@ -21,8 +21,11 @@
     "jalali",
     "shamsi",
     "date-picker",
+    "date-range-picker",
+    "bank-card",
     "national-id",
     "sheba",
+    "number-to-words",
     "react"
   ],
   "type": "module",

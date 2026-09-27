@@ -315,6 +315,8 @@ export const PersianDateRangePicker = forwardRef<HTMLInputElement, PersianDateRa
           dir="ltr"
           inputMode="numeric"
           autoComplete="off"
+          // Wide enough for «۱۴۰۴/۰۱/۱۵»; the default (20) makes the field too wide when it sizes to fit.
+          size={10}
           className={cx(
             "pui-field__input",
             "pui-date-range-picker__input",

@@ -467,6 +467,7 @@ li[data-hit] .search__mark {
 /* The picker's dialog is absolutely positioned: leave room for it. */
 .theme-card-picker {
   display: block;
+  place-items: normal;
   inline-size: 17.25rem;
   padding: 1rem;
   padding-block-end: 23.5rem;

@@ -57,6 +57,9 @@ if (failures.length === 0) {
   const cjs = createRequire(import.meta.url)("../dist/index.cjs");
   const core = await import("@amirjaz/persian-ui/core");
   check(core.toGregorian({ year: 1404, month: 1, day: 1 }) === "2025-03-21", "core: toGregorian is broken");
+  check(core.numberToWords(1250000) === "یک میلیون و دویست و پنجاه هزار", "core: numberToWords is broken");
+  check(core.getBankFromCardNumber("603799")?.id === "melli", "core: getBankFromCardNumber is broken");
+  check(core.fixKeyboardLayout("sghl", "fa") === "سلام", "core: fixKeyboardLayout is broken");
   for (const [format, components] of [["ESM", esm], ["CJS", cjs]]) {
     const html = renderToString(
       createElement(components.PersianText, null, "شماره +98 912 345 6789"),
@@ -64,6 +67,12 @@ if (failures.length === 0) {
     check(html.includes('<bdi dir="ltr">+98 912 345 6789</bdi>'), `${format}: PersianText renders wrong`);
     const picker = renderToString(createElement(components.PersianDatePicker, { label: "تاریخ" }));
     check(picker.includes("pui-date-picker"), `${format}: PersianDatePicker doesn't render`);
+    const range = renderToString(
+      createElement(components.PersianDateRangePicker, { label: "سفر", defaultValue: { start: "2025-04-04", end: "2025-04-09" }, defaultOpen: true }),
+    );
+    check(range.includes("data-in-range"), `${format}: PersianDateRangePicker doesn't render`);
+    const card = renderToString(createElement(components.CardNumberInput, { label: "کارت", defaultValue: "603799" }));
+    check(card.includes('data-bank="melli"'), `${format}: CardNumberInput doesn't render the bank`);
   }
 }
 
