@@ -1,3 +1,4 @@
+import type { CardNumberInvalidReason } from "./validators/card";
 import type { MobileInvalidReason } from "./validators/mobile";
 import type { NationalIdInvalidReason } from "./validators/national-id";
 import type { PlateInvalidReason } from "./validators/plate";
@@ -10,6 +11,7 @@ export interface ValidationMessages {
   sheba: Record<ShebaInvalidReason, string>;
   postalCode: Record<PostalCodeInvalidReason, string>;
   plate: Record<PlateInvalidReason, string>;
+  card: Record<CardNumberInvalidReason, string>;
 }
 
 /**
@@ -54,5 +56,12 @@ export const validationMessages: ValidationMessages = {
     letter: "حرف پلاک معتبر نیست.",
     region: "کد استان پلاک معتبر نیست.",
     zeroDigit: "شماره پلاک نباید رقم صفر داشته باشد.",
+  },
+  card: {
+    empty: "شماره کارت را وارد کنید.",
+    invalidCharacters: "شماره کارت فقط باید شامل رقم باشد.",
+    length: "شماره کارت باید ۱۶ رقم باشد.",
+    repeatedDigits: "شماره کارت معتبر نیست.",
+    checksum: "شماره کارت معتبر نیست.",
   },
 };

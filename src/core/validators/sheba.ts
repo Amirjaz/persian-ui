@@ -1,3 +1,4 @@
+import { getBankFromSheba, type IranianBank } from "../banks";
 import type { ValidationResult } from "../types";
 import { compactDigits, invalid } from "./shared";
 
@@ -7,6 +8,8 @@ export type ShebaResult = ValidationResult<
   {
     /** "IR" followed by 24 digits, no spaces. */
     value: string;
+    /** The bank holding the account (from the bank code), or `null` if unknown. */
+    bank: IranianBank | null;
   },
   ShebaInvalidReason
 >;
@@ -20,6 +23,7 @@ const IR_AS_DIGITS = "1827";
  * Accepts `IR` + 24 digits or the 24 digits alone, in any digit script and
  * letter case, with spaces or dashes. Check digits 00, 01 and 99 are rejected
  * even though they can satisfy the mod-97 test (ISO 13616 only issues 02–98).
+ * The result also names the bank, from the three digits after the check digits.
  */
 export function validateSheba(iban: string): ShebaResult {
   const compact = compactDigits(iban).toUpperCase();
@@ -43,7 +47,8 @@ export function validateSheba(iban: string): ShebaResult {
   // Move the country code and check digits to the end, then take the remainder mod 97.
   if (mod97(digits.slice(2) + IR_AS_DIGITS + checkDigits) !== 1) return invalid("checksum");
 
-  return { valid: true, value: `IR${digits}` };
+  const value = `IR${digits}`;
+  return { valid: true, value, bank: getBankFromSheba(value) };
 }
 
 function mod97(numeric: string): number {

@@ -20,5 +20,6 @@ describe("validationMessages", () => {
     }
     expect(validationMessages.nationalId.length).toContain(fa("10"));
     expect(validationMessages.sheba.length).toContain(fa("24"));
+    expect(validationMessages.card.length).toContain(fa("16"));
   });
 });

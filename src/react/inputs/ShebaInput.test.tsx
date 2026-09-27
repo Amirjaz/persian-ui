@@ -11,6 +11,7 @@ import { ShebaInput, type ShebaInputProps } from "./ShebaInput";
 // Generated from the ISO 13616 checksum; not a real account.
 const IBAN = shebaFromBban("0120000000000000000123");
 const DIGITS = IBAN.slice(2);
+const RESULT = { valid: true, value: IBAN, bank: { id: "mellat", name: "بانک ملت" } };
 const grouped = (digits: string) => digits.replace(/^(\d{2})(\d{4})(\d{4})(\d{4})(\d{4})(\d{4})(\d{2})$/, "$1 $2 $3 $4 $5 $6 $7");
 
 function setup(props: Partial<ShebaInputProps> = {}) {
@@ -33,7 +34,7 @@ describe("ShebaInput", () => {
     const { user, input, onValueChange } = setup({ digits: "en" });
     await user.type(input, DIGITS);
     expect(input).toHaveValue(grouped(DIGITS));
-    expect(onValueChange).toHaveBeenLastCalledWith(IBAN, { valid: true, value: IBAN });
+    expect(onValueChange).toHaveBeenLastCalledWith(IBAN, RESULT);
     expect(input).not.toHaveAttribute("aria-invalid");
   });
 
@@ -41,7 +42,7 @@ describe("ShebaInput", () => {
     const { user, input, onValueChange } = setup();
     await user.click(input);
     await user.paste(`IR${fa(grouped(DIGITS))}`);
-    expect(onValueChange).toHaveBeenLastCalledWith(IBAN, { valid: true, value: IBAN });
+    expect(onValueChange).toHaveBeenLastCalledWith(IBAN, RESULT);
     expect(input).toHaveValue(fa(grouped(DIGITS)));
   });
 

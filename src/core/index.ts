@@ -9,6 +9,11 @@ export type { NormalizeMode, NormalizeOptions } from "./normalize";
 export { formatRial, formatToman } from "./money";
 export type { MoneyAmount, MoneyFormatOptions } from "./money";
 
+export { numberToWords } from "./words";
+
+export { fixKeyboardLayout } from "./keyboard";
+export type { KeyboardLayout } from "./keyboard";
+
 export {
   JALALI_MONTH_NAMES,
   PERSIAN_WEEKDAY_NAMES,
@@ -50,6 +55,12 @@ export type {
   PlateParts,
   PlateResult,
 } from "./validators/plate";
+
+export { validateCardNumber } from "./validators/card";
+export type { CardNumberInvalidReason, CardNumberResult } from "./validators/card";
+
+export { IRANIAN_BANKS, getBankFromCardNumber, getBankFromSheba } from "./banks";
+export type { IranianBank, IranianBankId, IranianBankRecord } from "./banks";
 
 export { validationMessages } from "./messages";
 export type { ValidationMessages } from "./messages";

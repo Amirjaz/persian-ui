@@ -5,7 +5,8 @@ Everything in `@amirjaz/persian-ui`, in detail. For an overview, see the
 
 - [Setup](#setup)
 - [Utilities: `@amirjaz/persian-ui/core`](#utilities-amirjazpersian-uicore): digits,
-  `normalizePersian`, money, Jalali dates, validators
+  `normalizePersian`, keyboard layout fix, money, amounts in words, Jalali dates,
+  validators, banks
 - [Components: `@amirjaz/persian-ui`](#components-amirjazpersian-ui): direction,
   `PersianText`, masked inputs, `PriceInput`, `PersianDatePicker`
 - [Styling](#styling): cascade layer, Tailwind, CSS variables, dark mode, shadcn/ui
@@ -79,6 +80,24 @@ normalizePersian("خانۀ علي", { mode: "search" }); // "خانه علی"
 
 Normalizing twice gives the same result as normalizing once (property-tested).
 
+### `fixKeyboardLayout(text, to)`
+
+Retypes text typed with the wrong keyboard layout active: what the same keys
+produce in the Persian layout (`"fa"`) or the US English one (`"en"`).
+
+```ts
+import { fixKeyboardLayout } from "@amirjaz/persian-ui/core";
+
+fixKeyboardLayout("sghl o,fd?", "fa"); // "سلام خوبی؟"
+fixKeyboardLayout("اثممخ", "en"); // "hello"
+```
+
+The Persian layout is ISIRI 9147, the standard one (Windows "Persian (Standard)",
+macOS, Android, iOS), including the Shift level: uppercase Latin letters count as
+Shift, so «H» becomes «آ» and «B» a ZWNJ. Characters no key produces pass through
+unchanged, and the whole text is assumed to come from the other layout. In a search
+box, try the query as typed first, then its retyped form.
+
 ### Money
 
 ```ts
@@ -95,6 +114,23 @@ Options: `suffix` (default `true`), `digits` (`"fa"` default, or `"en"`) and
 `separator` (default `٬` with Persian digits, `,` with Latin). Amounts can be
 numbers, bigints or numeric strings in any digit script. The output follows CLDR's
 Persian number format, the same as `Intl.NumberFormat("fa-IR")`.
+
+### Amounts in words: `numberToWords`
+
+```ts
+import { numberToWords } from "@amirjaz/persian-ui/core";
+
+numberToWords(1250000); // "یک میلیون و دویست و پنجاه هزار"
+numberToWords("۲۰۲۵"); // "دو هزار و بیست و پنج"
+numberToWords(-7); // "منفی هفت"
+numberToWords(1000); // "یک هزار"
+```
+
+Whole numbers only, as numbers, bigints or numeric strings in any digit script (with
+separators), up to 10¹⁸ − 1 (scale words up to کوادریلیون). Fractions, numbers
+beyond `Number.MAX_SAFE_INTEGER` (pass a bigint or a string) and malformed input
+throw a `RangeError`. `PriceInput` can show the amount in words under the field
+(`showWords`).
 
 ### Jalali dates
 
@@ -154,7 +190,8 @@ if (!result.valid) console.log(validationMessages.nationalId[result.reason]); //
 |---|---|---|---|
 | `validateNationalId(code, { padShort })` | 10 digits; with `padShort`, also 8–9 digits whose leading zeros were lost (spreadsheets) | `value` | `empty` `invalidCharacters` `length` `repeatedDigits` `zeroSerial` `checksum` |
 | `validateIranianMobile(number)` | `09…`, `+989…`, `00989…`, `989…`, `9…` | `value` (`09…`), `e164`, `operator` | `empty` `invalidCharacters` `countryCode` `notMobile` `length` |
-| `validateSheba(iban)` | `IR` + 24 digits, or the 24 digits alone, any case | `value` (`IR…`) | `empty` `invalidCharacters` `country` `length` `checksum` |
+| `validateSheba(iban)` | `IR` + 24 digits, or the 24 digits alone, any case | `value` (`IR…`), `bank` | `empty` `invalidCharacters` `country` `length` `checksum` |
+| `validateCardNumber(card)` | 16 digits, usually in groups of four | `value`, `bank` | `empty` `invalidCharacters` `length` `repeatedDigits` `checksum` |
 | `validatePostalCode(code, { strict })` | 10 digits, usually written «۱۳۴۵۶-۷۸۹۱۴» | `value` | `empty` `invalidCharacters` `length` `repeatedDigits` `pattern` |
 | `validatePlate(plate, { strict })` | «۱۲ ب ۳۴۵ ایران ۶۷», `12ب345-67`, `12ب34567`, «ا» for «الف» | `value` (`12ب345-67`), `parts` | `empty` `format` `letter` `region` `zeroDigit` |
 
@@ -173,8 +210,35 @@ Notes:
 - **Plates:** all issued letters are accepted, including الف پ ت ث ز ژ ش ع ف ک گ.
   `strict` also rejects 0 in the number groups (never issued there, according to
   Wikipedia).
+- **Card numbers:** the Luhn checksum. A number made of one repeated digit passes it
+  but is never issued, so it is rejected.
 - `validationMessages` holds a Persian message for every validator and reason.
   `PLATE_LETTERS` lists the plate letters.
+
+### Banks
+
+`validateCardNumber` and `validateSheba` name the bank (`bank`), and so do these,
+which also work on a partial number while the user is still typing:
+
+```ts
+import { getBankFromCardNumber, getBankFromSheba, IRANIAN_BANKS } from "@amirjaz/persian-ui/core";
+
+getBankFromCardNumber("6037 99"); // { id: "melli", name: "بانک ملی ایران" }
+getBankFromSheba("IR06 0170 …"); // { id: "melli", name: "بانک ملی ایران" }
+getBankFromCardNumber("6273 81"); // { id: "sepah", name: "بانک سپه", formerly: "بانک انصار" }
+getBankFromCardNumber("4111 11"); // null
+```
+
+- `id` is a stable English slug (`"melli"`, `"mellat"`, `"tosee-saderat"`…) for keys
+  and logos; `name` is Persian.
+- Banks that merged into another report the bank that serves their cards and
+  accounts today, with `formerly` holding the name printed on the card: Ansar,
+  Ghavamin, Hekmat Iranian, Kosar and Mehr Eqtesad → Sepah (1399); Noor → Melli
+  (1402); Ayandeh → Melli (1404).
+- `IRANIAN_BANKS` is the table itself: `{ id, name, cardPrefixes, shebaCodes, mergedInto? }`.
+  There is no official public list of card prefixes, so a prefix is included only
+  when at least two independent sources agree; unknown prefixes give `null`, and
+  those cards still validate.
 
 ---
 
