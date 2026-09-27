@@ -2,23 +2,24 @@ import "./shots.css";
 import { normalizePersian } from "@amirjaz/persian-ui/core";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
+  CardNumberInput,
   DirectionProvider,
   MobileInput,
   NationalIdInput,
   PersianCalendar,
   PersianDatePicker,
+  PersianDateRangePicker,
   PersianText,
   PriceInput,
-  ShebaInput,
 } from "../src/react";
-import { nationalIdFromBody, shebaFromBban } from "../test/generators";
+import { cardNumberFromBody, nationalIdFromBody } from "../test/generators";
 
 /*
  * Scenes captured for the README by scripts/screenshots.mjs (open /?shots).
  * Identifiers are generated from their checksums, never real ones.
  */
 const NATIONAL_ID = nationalIdFromBody("001234567");
-const SHEBA = shebaFromBban("0170000000123456789012");
+const CARD = cardNumberFromBody("603799000012345");
 const ZWNJ = "\u200c";
 
 export function Shots() {
@@ -57,8 +58,8 @@ function HeroShot() {
             <div className="form-card__grid">
               <NationalIdInput name="nationalId" label="کد ملی" defaultValue={NATIONAL_ID} />
               <MobileInput name="mobile" label="تلفن همراه" defaultValue="09123456789" />
-              <ShebaInput className="span-2" name="sheba" label="شماره شبا" defaultValue={SHEBA} />
-              <PriceInput name="amount" label="مبلغ وام" defaultValue={150000000} />
+              <CardNumberInput className="span-2" name="card" label="شماره کارت برای واریز" defaultValue={CARD} />
+              <PriceInput name="amount" label="مبلغ وام" defaultValue={150000000} showWords />
               <PersianDatePicker name="birthDate" label="تاریخ تولد" defaultValue="1998-08-23" />
             </div>
             <button type="submit" className="form-card__submit">
@@ -277,10 +278,15 @@ function ThemesShot() {
   return (
     <section id="shot-themes" className="canvas trio" dir="ltr">
       <div className="scene-col">
-        <Eyebrow dot="blue">Default · right-to-left</Eyebrow>
+        <Eyebrow dot="blue">Date range · right-to-left</Eyebrow>
         <DirectionProvider dir="rtl">
           <div className="card theme-card theme-card-picker" dir="rtl">
-            <PersianDatePicker label="تاریخ سفر" defaultValue="2025-03-21" defaultOpen />
+            <PersianDateRangePicker
+              label="تاریخ سفر"
+              defaultValue={{ start: "2025-03-30", end: "2025-04-05" }}
+              defaultOpen
+              showFooter={false}
+            />
           </div>
         </DirectionProvider>
       </div>

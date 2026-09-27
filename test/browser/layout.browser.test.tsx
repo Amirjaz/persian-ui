@@ -172,6 +172,21 @@ describe.each(["rtl", "ltr"] as const)("layout in a %s page", (dir) => {
     else expect(Math.abs(popup.left - control.left)).toBeLessThan(1);
   });
 
+  it("keeps the range picker about two dates wide when it sizes to fit", () => {
+    render(
+      <div dir={dir} style={{ display: "inline-flex" }}>
+        <PersianDateRangePicker label="سفر" defaultValue={{ start: "2025-04-04", end: "2025-04-09" }} />
+      </div>,
+    );
+    const field = rect(document.querySelector(".pui-date-range-picker")!);
+    expect(field.width).toBeLessThan(340);
+    // Both dates still show in full.
+    for (const name of ["سفر از", "سفر تا"]) {
+      const input = screen.getByRole("textbox", { name }) as HTMLInputElement;
+      expect(input.scrollWidth).toBeLessThanOrEqual(input.clientWidth);
+    }
+  });
+
   it("puts the price unit switch at the end of the field", () => {
     render(
       <div dir={dir}>

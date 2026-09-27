@@ -1,6 +1,6 @@
 // Captures the README images from the playground. Dev only.
 // 1. pnpm dev   2. node scripts/screenshots.mjs   (uses the installed Edge; PUI_BROWSER_CHANNEL=chrome for Chrome)
-// Set PORT if the playground isn't on 5199.
+// Set PORT if the playground isn't on 5199, and PUI_SHOTS_DIR to write somewhere other than docs/images.
 /* global document -- used inside page.evaluate, which runs in the browser */
 import { mkdirSync } from "node:fs";
 import { chromium } from "playwright";
