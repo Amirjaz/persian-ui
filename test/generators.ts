@@ -37,3 +37,22 @@ export function shebaFromBban(bban: string): string {
 
 /** Valid Sheba numbers with random 22-digit account parts. */
 export const shebaArb = fc.stringMatching(/^\d{22}$/).map(shebaFromBban);
+
+/** Appends the Luhn check digit to the first 15 digits of a card number. */
+export function cardNumberFromBody(body: string): string {
+  let sum = 0;
+  for (let index = 0; index < 15; index += 1) {
+    // From the right, the check digit is position 0, so the body's last digit is doubled.
+    let digit = Number(body[14 - index]);
+    if (index % 2 === 0) digit = digit * 2 > 9 ? digit * 2 - 9 : digit * 2;
+    sum += digit;
+  }
+  return body + String((10 - (sum % 10)) % 10);
+}
+
+/** Valid card numbers starting with `prefix` (six digits), random otherwise. */
+export const cardNumberArb = (prefix: string) =>
+  fc
+    .stringMatching(/^\d{9}$/)
+    .map((rest) => cardNumberFromBody(prefix + rest))
+    .filter((card) => !/^(\d)\1*$/.test(card));

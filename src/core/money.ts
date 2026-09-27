@@ -50,9 +50,11 @@ export function formatRial(amount: MoneyAmount, options?: MoneyFormatOptions): s
   return formatMoney(amount, "ریال", options);
 }
 
-interface ParsedAmount {
+export interface ParsedAmount {
   negative: boolean;
+  /** Latin digits without leading zeros ("0" for zero). */
   integer: string;
+  /** Latin digits after the decimal point, possibly empty. */
   fraction: string;
 }
 
@@ -69,7 +71,8 @@ function formatMoney(amount: MoneyAmount, unit: string, options: MoneyFormatOpti
   return suffix ? `${body} ${unit}` : body;
 }
 
-function parseAmount(amount: MoneyAmount): ParsedAmount {
+/** Parses any accepted amount. Internal: also used by `numberToWords`. */
+export function parseAmount(amount: MoneyAmount): ParsedAmount {
   if (typeof amount === "bigint") {
     const negative = amount < 0n;
     return parsed(negative, (negative ? -amount : amount).toString(), "");

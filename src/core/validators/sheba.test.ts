@@ -22,7 +22,7 @@ describe("validateSheba", () => {
           `IR-${digits}`,
           `${LRM}${grouped}`,
         ];
-        for (const input of variants) expect(validateSheba(input)).toEqual({ valid: true, value: iban });
+        for (const input of variants) expect(validateSheba(input)).toMatchObject({ valid: true, value: iban });
       }),
     );
   });
@@ -77,5 +77,16 @@ describe("validateSheba", () => {
     for (const input of ["IR", `IR${"1".repeat(23)}`, `IR${"1".repeat(25)}`, "1".repeat(23)]) {
       expect(validateSheba(input)).toEqual(invalid("length"));
     }
+  });
+
+  it("names the bank from the code after the check digits", () => {
+    const melli = shebaFromBban("0170000000000000000123");
+    expect(validateSheba(melli)).toEqual({ valid: true, value: melli, bank: { id: "melli", name: "بانک ملی ایران" } });
+
+    const ansar = shebaFromBban("0630000000000000000123");
+    expect(validateSheba(ansar)).toMatchObject({ bank: { id: "sepah", name: "بانک سپه", formerly: "بانک انصار" } });
+
+    const unknown = shebaFromBban("0990000000000000000123");
+    expect(validateSheba(unknown)).toMatchObject({ valid: true, bank: null });
   });
 });
